@@ -2,7 +2,7 @@
 A package for determining the matrix language in bilingual sentences. This is the implementation of the algorithms presented in the paper [Methods for Automatic Matrix Language Determination of Code-Switched Speech](https://aclanthology.org/2024.emnlp-main.330/). Currently supports English/Mandarin code-switching, create a [feature request](https://github.com/DinoTheDinosaur/ml_determination/issues/new/choose) if you want the system to be extended to other languages.
 
 
-## Installation
+## Installation
 
 The main functionality can be easily installed into your Python environment using pip:
 
