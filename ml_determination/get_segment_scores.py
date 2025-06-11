@@ -1,6 +1,7 @@
-import ml_determination.data
 import torch
 import numpy as np
+
+from ml_determination import data, model
 from transformers import BertTokenizer, BertForMaskedLM
 
 
@@ -20,13 +21,14 @@ class Scorer:
         corpus = data.Corpus(data_path)
         self.ntokens = len(corpus.dictionary)
         self.vocab = corpus.dictionary.word2idx
-
         print("Load model and criterion.")
-        with open(model_path, 'rb') as f:
-            self.model = torch.load(f, map_location=self.device)
+        self.model = model.TransformerModel(
+            self.ntokens, 200, 2, 200, 2, 0.2
+        )
+        self.model.load_state_dict(
+            torch.load(model_path, map_location=self.device))
         self.model.eval()
         self.criterion = torch.nn.NLLLoss(reduction='none')
-
 
     def get_input_and_target(self, hyps):
         batch_size = len(hyps)
@@ -65,7 +67,6 @@ class Scorer:
         target = target.t().contiguous().view(-1).to(self.device)
         return data, target, seq_lens, inputs
 
-
     def compute_sentence_score(self, data, target):
         with torch.no_grad():
             output = self.model(data)
@@ -75,11 +76,11 @@ class Scorer:
         sent_scores = (loss.cpu().numpy() * 10000).astype(int) / 10000
         return sent_scores
 
-
     def compute_scores(self, sentence):
         data, targets, seq_lens, inputs = self.get_input_and_target([sentence])
         scores = self.compute_sentence_score(data, targets)[0][1:]
         return scores
+
 
 class SegmentsScorerBERT:
     def __init__(self):
