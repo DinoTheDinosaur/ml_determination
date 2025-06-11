@@ -1,19 +1,20 @@
 # ml_determination
-A package for determining the matrix language in bilingual sentences. This is the implementation of the algorithms presented in the paper "Methods for Automatic Matrix Language Determination of Code-Switched Speech". Currently supports English/Mandarin code-switching, create a [feature request](https://github.com/DinoTheDinosaur/ml_determination/issues/new/choose) if you want the system to be extended to other languages.
+A package for determining the matrix language in bilingual sentences. This is the implementation of the algorithms presented in the paper [Methods for Automatic Matrix Language Determination of Code-Switched Speech](https://aclanthology.org/2024.emnlp-main.330/). Currently supports English/Mandarin code-switching, create a [feature request](https://github.com/DinoTheDinosaur/ml_determination/issues/new/choose) if you want the system to be extended to other languages.
 
 ## Installation
 
 The main functionality can be easily installed into your Python environment using pip:
 
-```
+```shell
 pip install ml-determination
 ```
+
 
 ## Usage
 
 To predict the matrix language using the package import the library and the matrix language determination classes for text:
 
-```
+```python
 >>> from ml_determination.predict_matrix_language import MatrixLanguageDeterminerWordMajority
 >>> ml = MatrixLanguageDeterminerWordMajority(L1='ZH', L2='EN')
 >>> ml.determine_ML('然后 那些 air supply 的 然后 michael learns to rock 的 啊 certain 的 啦')
@@ -22,21 +23,46 @@ To predict the matrix language using the package import the library and the matr
 
 The package includes several implementations of methods for matrix language determination:
 
-1. Word majority [Bullock et al 2018](https://aclanthology.org/W18-3208/): MatrixLanguageDeterminerWordMajority
-2. First part of the Morpheme Order Principle [Myers-Scotton 2002](https://academic.oup.com/book/36360), called the singleton principle in [Iakovenko 2024](https://aclanthology.org/2024.emnlp-main.330/): MatrixLanguageDeterminerP11
-3. Second part of the the Morpheme Order Principle as in [Iakovenko 2024](https://aclanthology.org/2024.emnlp-main.330/): MatrixLanguageDeterminerP12
-4. System Morpheme Principle [Myers-Scotton 2002](https://academic.oup.com/book/36360): MatrixLanguageDeterminerP2
+1. Word majority from [Bullock et al 2018](https://aclanthology.org/W18-3208/): **MatrixLanguageDeterminerWordMajority**
+2. First part of the Morpheme Order Principle from [Myers-Scotton 2002](https://academic.oup.com/book/36360), called the singleton principle in [Iakovenko 2024](https://aclanthology.org/2024.emnlp-main.330/): **MatrixLanguageDeterminerP11**
+3. Second part of the the Morpheme Order Principle as in [Iakovenko 2024](https://aclanthology.org/2024.emnlp-main.330/): **MatrixLanguageDeterminerP12**
+4. System Morpheme Principle from [Myers-Scotton 2002](https://academic.oup.com/book/36360): **MatrixLanguageDeterminerP2**
+
+### P1.2 matrix language determiner usage
+
+**MatrixLanguageDeterminerP12** requires trained language models for running in order to rescore code-switched sentences. To download the trained models, used in the experiments of [Iakovenko 2024](https://aclanthology.org/2024.emnlp-main.330/), clone the following repository:
+
+```shell
+cd /your/model/folder
+git clone https://huggingface.co/dinoyay/ml-determination-lms
+```
+
+Then you can determine the matrix language using P1.2:
+
+```python
+>>> from ml_determination.predict_matrix_language import MatrixLanguageDeterminerP12
+>>> config = {
+  'EN': {
+    'data_path': '/your/model/folder/ml-determination-lms/en/',
+    'model_path': '/your/model/folder/ml-determination-lms/en/model.pt'},
+  'ZH': {
+    'data_path': '/your/model/folder/ml-determination-lms/zh/',
+    'model_path': '/your/model/folder/ml-determination-lms/zh/model.pt'
+    }
+  }
+>>> ml = MatrixLanguageDeterminerP12(L1='ZH', L2='EN', config=config, alpha=1.2765)
+>>> ml.determine_ML('然后 那些 air supply 的 然后 michael learns to rock 的 啊 certain 的 啦')
+'ZH'
+```
 
 ## Citation
 If you use ml_determination in your projects, please feel free to cite the original EMNLP paper the following way:
 
+```
 @inproceedings{iakovenko-hain-2024-methods,
     title = "Methods of Automatic Matrix Language Determination for Code-Switched Speech",
-    author = "Iakovenko, Olga  and
-      Hain, Thomas",
-    editor = "Al-Onaizan, Yaser  and
-      Bansal, Mohit  and
-      Chen, Yun-Nung",
+    author = "Iakovenko, Olga  and Hain, Thomas",
+    editor = "Al-Onaizan, Yaser and Bansal, Mohit and Chen, Yun-Nung",
     booktitle = "Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing",
     month = nov,
     year = "2024",
@@ -44,6 +70,10 @@ If you use ml_determination in your projects, please feel free to cite the origi
     publisher = "Association for Computational Linguistics",
     url = "https://aclanthology.org/2024.emnlp-main.330/",
     doi = "10.18653/v1/2024.emnlp-main.330",
-    pages = "5791--5800",
-    abstract = "Code-switching (CS) is the process of speakers interchanging between two or more languages which in the modern world becomes increasingly common. In order to better describe CS speech the Matrix Language Frame (MLF) theory introduces the concept of a Matrix Language, which is the language that provides the grammatical structure for a CS utterance. In this work the MLF theory was used to develop systems for Matrix Language Identity (MLID) determination. The MLID of English/Mandarin and English/Spanish CS text and speech was compared to acoustic language identity (LID), which is a typical way to identify a language in monolingual utterances. MLID predictors from audio show higher correlation with the textual principles than LID in all cases while also outperforming LID in an MLID recognition task based on F1 macro (60{\%}) and correlation score (0.38). This novel approach has identified that non-English languages (Mandarin and Spanish) are preferred over the English language as the ML contrary to the monolingual choice of LID."
+    pages = "5791--5800"
 }
+```
+
+## Acknoledgements
+
+This code was created with the support of [Engineering and Physical Sciences Research Council](https://gtr.ukri.org/projects?ref=studentship-2676033).

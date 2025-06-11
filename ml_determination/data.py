@@ -1,5 +1,5 @@
 import os
-from io import open_io
+from io import open as open_io
 import torch
 
 from collections import Counter

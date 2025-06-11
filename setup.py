@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="ml_determination",
-    version="0.1.0",
+    version="1.0.0",
     packages=find_packages(),
     include_package_data=True,  # to include non-code files
     install_requires=[
